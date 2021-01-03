@@ -34,13 +34,13 @@ body, #root, .App {
   text-decoration: none;
 }
 .react-calendar__tile--now abbr {
-  @apply inline-block text-white bg-blue-700 rounded-full !important;
-  width: 30px;
+  @apply inline-block text-white bg-blue-700 rounded-full px-2 !important;
+  min-width: 30px;
   line-height: 30px;
 }
 .react-calendar__tile--active abbr {
-  @apply inline-block text-pink-600 bg-pink-100 rounded-full;
-  width: 30px;
+  @apply inline-block text-pink-600 bg-pink-100 rounded-full px-2;
+  min-width: 30px;
   line-height: 30px;
 }
 .react-calendar__navigation, .react-calendar__month-view__weekdays {

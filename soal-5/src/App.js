@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 
 import avatar from './assets/images/avatar.png';
@@ -10,6 +10,25 @@ import iconDelete from './assets/images/icon-trash.svg';
 function App() {
   const [date, setDate] = useState(new Date());
   const [modal, setModal] = useState(false);
+  const [data, setData] = useState([]);
+  const [selectedData, setSelectedData] = useState(null);
+  const body = document.body;
+
+  useEffect(() => fetch('https://jsonplaceholder.typicode.com/todos')
+    .then(res => res.json())
+    .then(json => setData(json)),
+    []
+  );
+
+  const openModal = () => {
+    setModal(true);
+    body.classList.add('overflow-hidden');
+  }
+
+  const closeModal = () => {
+    setModal(false);
+    body.classList.remove('overflow-hidden');
+  }
 
   return (
     <div className="App flex flex-col">
@@ -50,7 +69,8 @@ function App() {
         <div className="todos p-6 w-full md:w-2/3 space-y-8">
           <h2 className="text-3xl font-bold">Task For Today</h2>
           <div className="options space-x-3 flex w-full">
-            <button type="button" onClick={() => setModal(true)} className="btn-new-task flex-none">
+            <button type="button" onClick={openModal} className="btn-new-task flex-none">
+              <i className="fa fa-plus"/>{' '}
               Create New
             </button>
             
@@ -60,21 +80,35 @@ function App() {
           </div>
 
           <ul className="todos flex flex-col space-y-6">
-            {[1, 2, 3, 4, 5].map(x => (
-              <li className="todo">
+            {data.slice(0, 10).map(x => (
+              <li key={x.id} className="todo">
                 <h3 className="text-2xl font-bold mb-5">
-                  Todo title
-                  <button type="button" className="btn-complete bg-pink-100 text-pink-600 text-sm px-3 py-2 rounded-lg ml-3">Complete</button>
+                  {x.title}
+                  <button
+                    type="button"
+                    className={`btn-complete ${
+                      x.completed
+                        ? 'bg-green-100 text-green-600'
+                        : ' bg-pink-100 text-pink-600'
+                    } text-sm px-3 py-2 rounded-lg ml-3`}
+                  >
+                    {x.completed ? (
+                      <>completed <i className="fa fa-check"/></>
+                    ) : 'Set to complete'}
+                  </button>
                 </h3>
 
                 <div className="text flex items-end space-x-3">
                   <p className="flex-grow">
-                    1. Dont forget prepare your report and any blocker in Front end. <br/>
-                    2. Telling Project Manager for new assignment. 
+                    {x.title}
                   </p>
 
                   <div className="actions flex-none space-x-3">
-                    <button type="button" className="btn-edit hover:text-blue-700">
+                    <button
+                      type="button"
+                      className="btn-edit hover:text-blue-700"
+                      onClick={openModal}
+                    >
                       <img src={iconEdit} alt=""/>
                     </button>
                     <button type="button" className="btn-delete hover:text-pink-600">
@@ -89,10 +123,10 @@ function App() {
       </div>
 
       {modal && (
-        <div className="modal fixed w-screen h-screen z-10 flex justify-center items-center">
-          <div onClick={() => setModal(false)} className="overlay bg-black opacity-30 absolute w-screen h-screen"></div>
+        <div className="modal fixed w-screen h-screen z-10 flex justify-center items-start pt-32 pb-12 overflow-y-auto">
+          <div onClick={closeModal} className="overlay bg-black opacity-30 fixed w-screen h-screen top-0"></div>
 
-          <div className="modal-dialog bg-white rounded-2xl p-9 z-20 w-full max-w-screen-sm">
+          <div className="modal-dialog bg-white rounded-2xl p-9 z-20 w-full max-w-screen-sm h-auto">
             <h2 className="font-bold text-lg mb-6">New Task</h2>
 
             <form action="" className="w-full space-y-4">
@@ -119,7 +153,7 @@ function App() {
               </div>
 
               <div className="buttons flex justify-center space-x-4">
-                <button type="button" onClick={() => setModal(false)} className="bg-transparent p-3 text-blue-700">Cancel</button>
+                <button type="button" onClick={closeModal} className="bg-transparent p-3 text-blue-700">Cancel</button>
                 <button type="submit" className="bg-blue-700 hover:bg-blue-600 p-3 text-white rounded-lg">Create Task</button>
               </div>
             </form>
